@@ -304,12 +304,21 @@ intro.addEventListener('touchstart', e=>{ e.preventDefault(); enter(); }, {passi
 
 /* ---- Botão "Não": foge em sequência (topo → canto esquerdo → some) ---- */
 const noBtn=$('noBtn'), yesBtn=$('yesBtn'), card=$('card'), choicesBox=$('choices');
-let step=0, fleeLock=false;
+let step=0, fleeLock=false, yesAnchored=false;
 function flee(){
   if(fleeLock) return; fleeLock=true; setTimeout(()=>fleeLock=false,160);
   const cr=choicesBox.getBoundingClientRect();
   const w=noBtn.offsetWidth, pad=12;
   noBtn.style.position='absolute';
+  if(!yesAnchored){            // trava o SIM num lugar seguro p/ o NÃO não cobri-lo
+    yesAnchored=true;
+    choicesBox.style.minHeight='120px';
+    yesBtn.style.position='absolute';
+    yesBtn.style.bottom='6px';
+    yesBtn.style.left=Math.round((cr.width - yesBtn.offsetWidth)/2)+'px';
+    yesBtn.style.zIndex='6';
+    noBtn.style.zIndex='1';
+  }
   if(step===0){            // 1º: sobe pro topo, ao lado do 🤘
     noBtn.style.top='8px';
     noBtn.style.left=Math.min(cr.width-w-pad, cr.width*0.54)+'px';
@@ -336,7 +345,7 @@ let advancing=false;
 function onYes(){
   startMusic();
   if(advancing) return; advancing=true;
-  showSelo(()=>go('s2'));
+  go('s2');
 }
 function showSelo(cb){
   const ov=$('seloOverlay'), img=$('seloImg');
